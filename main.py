@@ -138,7 +138,7 @@ class Quoridor(Board):
 
                 if self.board[y][x] == 1:
                     color = pygame.Color("white")
-                    pygame.draw.ellipse(screen, color,
+                    pygame.draw.rect(screen, color,
                                         (x * self.cell_size + self.left,
                                          y * self.cell_size + self.top, self.cell_size,
                                          self.cell_size))
@@ -163,13 +163,13 @@ class Quoridor(Board):
 
 def main():
     pygame.init()
-    size = 420, 420
+    size = 650, 650
     screen = pygame.display.set_mode(size)
     clock = pygame.time.Clock()
     pygame.display.set_caption('Quoridor')
 
-    board = Quoridor(10, 10)
-    board.set_view(10, 10, 40)
+    board = Quoridor(9, 9)
+    board.set_view(9, 9, 70)
 
     ticks = 0
 
