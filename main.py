@@ -1,5 +1,176 @@
 import copy
 import pygame
+import sys
+
+result = [[None, None], [None, None]]
+
+
+def terminate():
+    pygame.quit()
+    sys.exit()
+
+
+all_sprites = pygame.sprite.Group()
+
+
+class AnimatedSprite(pygame.sprite.Sprite):
+    def __init__(self, sheet, columns, rows, x, y):
+        super().__init__(all_sprites)
+        self.frames = []
+        self.cut_sheet(sheet, columns, rows)
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
+        self.rect = self.rect.move(x, y)
+
+    def cut_sheet(self, sheet, columns, rows):
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+                                sheet.get_height() // rows)
+        for j in range(rows):
+            for i in range(columns):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                self.frames.append(sheet.subsurface(pygame.Rect(
+                    frame_location, self.rect.size)))
+
+    def update(self):
+        self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+        self.image = self.frames[self.cur_frame]
+
+
+def start_screen():
+    intro_text = ["Quoridor", "",
+                  "Правила игры:",
+                  "Игроке делают ход поочереди, можно ставить стенку",
+                  "или перемещать свою фишку. Побеждает тот, чья ",
+                  "фишка первая окажется в противоположном конце поле.",
+                  "Нажмите, чтобы начать играть."]
+    pygame.init()
+    size = 650, 350
+    screen = pygame.display.set_mode(size)
+    clock = pygame.time.Clock()
+    pygame.display.set_caption('Quoridor')
+    font = pygame.font.Font(None, 30)
+    font1 = pygame.font.Font(None, 80)
+    text_coord = 50
+    girl = AnimatedSprite(pygame.image.load("girl.png").convert(), 8, 10, 550, -10)
+    for line in intro_text:
+        if line == "Quoridor":
+            string_rendered = font1.render(line, 1, pygame.Color('white'))
+        else:
+            string_rendered = font.render(line, 1, pygame.Color('white'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 10
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or \
+                    event.type == pygame.MOUSEBUTTONDOWN:
+                return  # начинаем игру
+        girl.update()
+        all_sprites.draw(screen)
+        pygame.display.flip()
+        clock.tick(10)
+
+
+def result_screen_1():
+    intro_text = ["Quoridor", "",
+                  f"Выиграл {'синий' if result[0][0] == 'blue' else 'красный'}",
+                  f"Сделано {result[0][1]} ходов"]
+    pygame.init()
+    size = 650, 350
+    screen = pygame.display.set_mode(size)
+    clock = pygame.time.Clock()
+    pygame.display.set_caption('Quoridor')
+    font = pygame.font.Font(None, 30)
+    font1 = pygame.font.Font(None, 80)
+    text_coord = 50
+    girl = AnimatedSprite(pygame.image.load("girl.png").convert(), 8, 10, 550, -10)
+    for line in intro_text:
+        if line == "Quoridor":
+            string_rendered = font1.render(line, 1, pygame.Color('white'))
+        else:
+            string_rendered = font.render(line, 1, pygame.Color('white'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 10
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or \
+                    event.type == pygame.MOUSEBUTTONDOWN:
+                return  # начинаем игру
+        girl.update()
+        all_sprites.draw(screen)
+        pygame.display.flip()
+        clock.tick(10)
+
+
+def result_screen_2():
+    if result[0][0] == 'blue' and result[1][0] == 'blue':
+        a = "Выиграл синий"
+    elif result[0][0] == 'red' and result[1][0] == 'red':
+        a = "Выиграл красный"
+    else:
+        a = "Ничья"
+    b = f"За первый раунд сделано {result[0][1]} ходов(победа {'синего' if result[0][0] == 'blue' else 'красного'})"
+    b1 = f"За второй раунд сделано {result[1][1]} ходов(победа {'синего' if result[1][0] == 'blue' else 'красного'})"
+    with open('all_results.txt', 'r') as f:
+        games = f.read()
+    with open('all_results.txt', 'w') as f:
+        if result[0][0] == 'blue' and result[1][0] == 'blue':
+            games += "1"
+            f.write(games)
+        elif result[0][0] == 'red' and result[1][0] == 'red':
+            games += "2"
+            f.write(games)
+        else:
+            games += "0"
+            f.write(games)
+    t = f"{games.count('0')} ничья(-их), {games.count('1')} побед(-а) синего, {games.count('2')} побед(-а) красного"
+    intro_text = ["Quoridor", "", a, b, b1,
+                  f"Всего сыграно {len(games)} партия(-ий), из которых", t]
+    pygame.init()
+    size = 650, 350
+    screen = pygame.display.set_mode(size)
+    clock = pygame.time.Clock()
+    pygame.display.set_caption('Quoridor')
+    font = pygame.font.Font(None, 30)
+    font1 = pygame.font.Font(None, 80)
+    text_coord = 50
+    girl = AnimatedSprite(pygame.image.load("girl.png").convert(), 8, 10, 550, -10)
+    for line in intro_text:
+        if line == "Quoridor":
+            string_rendered = font1.render(line, 1, pygame.Color('white'))
+        else:
+            string_rendered = font.render(line, 1, pygame.Color('white'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 10
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or \
+                    event.type == pygame.MOUSEBUTTONDOWN:
+                return  # начинаем игру
+        girl.update()
+        all_sprites.draw(screen)
+        pygame.display.flip()
+        clock.tick(10)
 
 
 class Board:
@@ -60,6 +231,7 @@ class Board:
 class Quoridor(Board):
     def __init__(self, width, height):
         super().__init__(width, height)
+        self.steps = 0
         self.selected_cell = None
         self.board[0][0] = 2
         self.board[-1][-1] = 3
@@ -276,6 +448,8 @@ class Quoridor(Board):
             self.blue_pos = cell
             self.board[y][x] = 2
             self.cur_person = "red"
+            if self.blue_pos[1] == self.height - 1:
+                self.final()
         elif self.cur_person == "red" and (x - 1 == self.red_pos[0] and y == self.red_pos[1] and
                                            self.walls1[y][min(x, x - 1)] == 0 or
                                            x + 1 == self.red_pos[0] and y == self.red_pos[1] and
@@ -287,7 +461,27 @@ class Quoridor(Board):
             self.board[self.red_pos[1]][self.red_pos[0]] = 0
             self.red_pos = cell
             self.board[y][x] = 3
+            self.steps += 1
             self.cur_person = "blue"
+            if self.red_pos[1] == 0:
+                self.final()
+
+    def final(self):
+        global result
+        if self.cur_person == "red":
+            print("Blue won")
+            print(self.steps + 1)
+            if result == [[None, None], [None, None]]:
+                result[0] = ["blue", self.steps + 1]
+            else:
+                result[1] = ["blue", self.steps + 1]
+        elif self.cur_person == "blue":
+            print("Red won")
+            print(self.steps)
+            if result == [[None, None], [None, None]]:
+                result[0] = ["red", self.steps]
+            else:
+                result[1] = ["red", self.steps]
 
     def render(self, screen, tick):
         for y in range(self.height):
@@ -336,7 +530,7 @@ class Quoridor(Board):
                                       self.cell_size / 4))
 
 
-def main():
+def main_1():
     pygame.init()
     size = 650, 650
     screen = pygame.display.set_mode(size)
@@ -351,11 +545,12 @@ def main():
     ticks2 = 0
     ticks3 = 0
 
-    running = True
-    while running:
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                terminate()
+            if result[0] != [None, None]:
+                return
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 last_wall_press = event.pos
                 board.get_click_wall(last_wall_press, None)
@@ -385,8 +580,63 @@ def main():
         clock.tick(60)
         ticks += 1
         ticks2 += 1
-    pygame.quit()
+
+
+def main_2():
+    pygame.init()
+    size = 790, 790
+    screen = pygame.display.set_mode(size)
+    clock = pygame.time.Clock()
+    pygame.display.set_caption('Quoridor')
+    last_wall_press = (100, 100)
+
+    board1 = Quoridor(11, 11)
+    board1.set_view(11, 11, 70)
+
+    ticks = 0
+    ticks2 = 0
+    ticks3 = 0
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if result[1] != [None, None]:
+                return
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                last_wall_press = event.pos
+                board1.get_click_wall(last_wall_press, None)
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3 and board1.curent_wall() == 0:
+                board1.get_click_move(event.pos)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT and board1.curent_wall() == 1:
+                board1.get_click_wall(last_wall_press, "left")
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT and board1.curent_wall() == 1:
+                board1.get_click_wall(last_wall_press, "right")
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP and board1.curent_wall() == 1:
+                board1.get_click_wall(last_wall_press, "up")
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN and board1.curent_wall() == 1:
+                board1.get_click_wall(last_wall_press, "down")
+
+        screen.fill((0, 0, 0))
+        board1.render(screen, ticks3)
+        if ticks == 60:
+            ticks = 0
+        if ticks2 == 20:
+            ticks2 = 0
+            if ticks3 == 1:
+                ticks3 = 0
+            else:
+                ticks3 = 1
+
+        pygame.display.flip()
+        clock.tick(60)
+        ticks += 1
+        ticks2 += 1
 
 
 if __name__ == '__main__':
-    main()
+    start_screen()
+    main_1()
+    result_screen_1()
+    main_2()
+    result_screen_2()
