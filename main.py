@@ -1,8 +1,7 @@
-import copy
 import pygame
 import sys
 
-result = [[None, None], [None, None]]
+result = [['', 0], ['', 0]]
 
 
 def terminate():
@@ -36,7 +35,51 @@ class AnimatedSprite(pygame.sprite.Sprite):
         self.image = self.frames[self.cur_frame]
 
 
+class Ball(pygame.sprite.Sprite):
+    def __init__(self, radius, x, y):
+        super().__init__(all_sprites)
+        self.radius = radius
+        self.image = pygame.Surface((2 * radius, 2 * radius), pygame.SRCALPHA, 32)
+        pygame.draw.circle(self.image, pygame.Color("green"), (radius, radius), radius)
+        self.rect = pygame.Rect(x, y, 2 * radius, 2 * radius)
+        self.vx = 2
+        self.vy = 2
+        self.add(balls)
+
+    def update(self):
+        self.rect = self.rect.move(self.vx, self.vy)
+        if pygame.sprite.spritecollideany(self, horizontal_borders):
+            self.vy = -self.vy
+        if pygame.sprite.spritecollideany(self, vertical_borders):
+            self.vx = -self.vx
+
+
+class Border(pygame.sprite.Sprite):
+    # строго вертикальный или строго горизонтальный отрезок
+    def __init__(self, x1, y1, x2, y2):
+        super().__init__(all_sprites)
+        if x1 == x2:  # вертикальная стенка
+            self.add(vertical_borders)
+            self.image = pygame.Surface([1, y2 - y1])
+            self.rect = pygame.Rect(x1, y1, 1, y2 - y1)
+        else:  # горизонтальная стенка
+            self.add(horizontal_borders)
+            self.image = pygame.Surface([x2 - x1, 1])
+            self.rect = pygame.Rect(x1, y1, x2 - x1, 1)
+
+
+horizontal_borders = pygame.sprite.Group()
+vertical_borders = pygame.sprite.Group()
+balls = pygame.sprite.Group()
+Ball(20, 400, 400)
+Border(10, 300, 640, 300)
+Border(10, 590, 640, 590)
+Border(10, 300, 10, 590)
+Border(640, 300, 640, 590)
+
+
 def start_screen():
+    ticks3 = 0
     intro_text = ["Quoridor", "",
                   "Правила игры:",
                   "Игроке делают ход поочереди, можно ставить стенку",
@@ -44,7 +87,7 @@ def start_screen():
                   "фишка первая окажется в противоположном конце поле.",
                   "Нажмите, чтобы начать играть."]
     pygame.init()
-    size = 650, 350
+    size = 650, 600
     screen = pygame.display.set_mode(size)
     clock = pygame.time.Clock()
     pygame.display.set_caption('Quoridor')
@@ -71,18 +114,38 @@ def start_screen():
             elif event.type == pygame.KEYDOWN or \
                     event.type == pygame.MOUSEBUTTONDOWN:
                 return  # начинаем игру
-        girl.update()
+        screen.fill(pygame.Color("black"))
+        for line in intro_text:
+            if line == "Quoridor":
+                string_rendered = font1.render(line, 1, pygame.Color('white'))
+            else:
+                string_rendered = font.render(line, 1, pygame.Color('white'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 10
+            text_coord += intro_rect.height
+            screen.blit(string_rendered, intro_rect)
+        text_coord = 50
+        pygame.draw.rect(screen, pygame.Color('white'), (0, 299, 650, 1))
         all_sprites.draw(screen)
+        horizontal_borders.update()
+        vertical_borders.update()
+        balls.update()
+        if ticks3 % 5 == 0:
+            girl.update()
         pygame.display.flip()
-        clock.tick(10)
+        clock.tick(50)
+        ticks3 += 1
 
 
 def result_screen_1():
+    ticks4 = 0
     intro_text = ["Quoridor", "",
                   f"Выиграл {'синий' if result[0][0] == 'blue' else 'красный'}",
                   f"Сделано {result[0][1]} ходов"]
     pygame.init()
-    size = 650, 350
+    size = 650, 600
     screen = pygame.display.set_mode(size)
     clock = pygame.time.Clock()
     pygame.display.set_caption('Quoridor')
@@ -109,13 +172,33 @@ def result_screen_1():
             elif event.type == pygame.KEYDOWN or \
                     event.type == pygame.MOUSEBUTTONDOWN:
                 return  # начинаем игру
-        girl.update()
+        screen.fill(pygame.Color("black"))
+        for line in intro_text:
+            if line == "Quoridor":
+                string_rendered = font1.render(line, 1, pygame.Color('white'))
+            else:
+                string_rendered = font.render(line, 1, pygame.Color('white'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 10
+            text_coord += intro_rect.height
+            screen.blit(string_rendered, intro_rect)
+        text_coord = 50
+        pygame.draw.rect(screen, pygame.Color('white'), (0, 299, 650, 1))
         all_sprites.draw(screen)
+        horizontal_borders.update()
+        vertical_borders.update()
+        balls.update()
+        if ticks4 % 5 == 0:
+            girl.update()
         pygame.display.flip()
-        clock.tick(10)
+        clock.tick(50)
+        ticks4 += 1
 
 
 def result_screen_2():
+    ticks5 = 0
     if result[0][0] == 'blue' and result[1][0] == 'blue':
         a = "Выиграл синий"
     elif result[0][0] == 'red' and result[1][0] == 'red':
@@ -137,10 +220,9 @@ def result_screen_2():
             games += "0"
             f.write(games)
     t = f"{games.count('0')} ничья(-их), {games.count('1')} побед(-а) синего, {games.count('2')} побед(-а) красного"
-    intro_text = ["Quoridor", "", a, b, b1,
-                  f"Всего сыграно {len(games)} партия(-ий), из которых", t]
+    intro_text = ["Quoridor", "", a, b, b1, f"Всего сыграно {len(games)} партия(-ий), из которых", t]
     pygame.init()
-    size = 650, 350
+    size = 650, 600
     screen = pygame.display.set_mode(size)
     clock = pygame.time.Clock()
     pygame.display.set_caption('Quoridor')
@@ -167,10 +249,29 @@ def result_screen_2():
             elif event.type == pygame.KEYDOWN or \
                     event.type == pygame.MOUSEBUTTONDOWN:
                 return  # начинаем игру
-        girl.update()
+        screen.fill(pygame.Color("black"))
+        for line in intro_text:
+            if line == "Quoridor":
+                string_rendered = font1.render(line, 1, pygame.Color('white'))
+            else:
+                string_rendered = font.render(line, 1, pygame.Color('white'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 10
+            text_coord += intro_rect.height
+            screen.blit(string_rendered, intro_rect)
+        text_coord = 50
+        pygame.draw.rect(screen, pygame.Color('white'), (0, 299, 650, 1))
         all_sprites.draw(screen)
+        horizontal_borders.update()
+        vertical_borders.update()
+        balls.update()
+        if ticks5 % 5 == 0:
+            girl.update()
         pygame.display.flip()
-        clock.tick(10)
+        clock.tick(50)
+        ticks5 += 1
 
 
 class Board:
@@ -471,14 +572,14 @@ class Quoridor(Board):
         if self.cur_person == "red":
             print("Blue won")
             print(self.steps + 1)
-            if result == [[None, None], [None, None]]:
+            if result == [['', 0], ['', 0]]:
                 result[0] = ["blue", self.steps + 1]
             else:
                 result[1] = ["blue", self.steps + 1]
         elif self.cur_person == "blue":
             print("Red won")
             print(self.steps)
-            if result == [[None, None], [None, None]]:
+            if result == [['', 0], ['', 0]]:
                 result[0] = ["red", self.steps]
             else:
                 result[1] = ["red", self.steps]
@@ -492,9 +593,8 @@ class Quoridor(Board):
                     else:
                         color = pygame.Color("black")
                     pygame.draw.rect(screen, color,
-                                        (x * self.cell_size + self.left,
-                                         y * self.cell_size + self.top, self.cell_size,
-                                         self.cell_size))
+                                     (x * self.cell_size + self.left, y * self.cell_size + self.top,
+                                      self.cell_size, self.cell_size))
                 elif self.board[y][x] == 2:
                     color = pygame.Color("blue")
                     pygame.draw.ellipse(screen, color,
@@ -549,7 +649,7 @@ def main_1():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
-            if result[0] != [None, None]:
+            if result[0] != ['', 0]:
                 return
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 last_wall_press = event.pos
@@ -601,7 +701,7 @@ def main_2():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
-            if result[1] != [None, None]:
+            if result[1] != ['', 0]:
                 return
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 last_wall_press = event.pos
