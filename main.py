@@ -570,15 +570,11 @@ class Quoridor(Board):
     def final(self):
         global result
         if self.cur_person == "red":
-            print("Blue won")
-            print(self.steps + 1)
             if result == [['', 0], ['', 0]]:
                 result[0] = ["blue", self.steps + 1]
             else:
                 result[1] = ["blue", self.steps + 1]
         elif self.cur_person == "blue":
-            print("Red won")
-            print(self.steps)
             if result == [['', 0], ['', 0]]:
                 result[0] = ["red", self.steps]
             else:
