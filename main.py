@@ -2,6 +2,7 @@ import pygame
 import sys
 
 result = [['', 0], ['', 0]]
+cur_level = 0
 
 
 def terminate():
@@ -594,27 +595,32 @@ class Quoridor(Board):
                 elif self.board[y][x] == 2:
                     color = pygame.Color("blue")
                     pygame.draw.ellipse(screen, color,
-                                        (x * self.cell_size + self.left,
-                                         y * self.cell_size + self.top, self.cell_size,
-                                         self.cell_size))
+                                        (x * self.cell_size + self.left + 5,
+                                         y * self.cell_size + self.top + 5, self.cell_size - 10,
+                                         self.cell_size - 10))
                 elif self.board[y][x] == 3:
                     color = pygame.Color("red")
                     pygame.draw.ellipse(screen, color,
-                                        (x * self.cell_size + self.left,
-                                         y * self.cell_size + self.top, self.cell_size,
-                                         self.cell_size))
-
-                pygame.draw.rect(screen, pygame.Color(255, 255, 255),
-                                 (x * self.cell_size + self.left, y * self.cell_size + self.top,
-                                  self.cell_size,
-                                  self.cell_size), 1)
+                                        (x * self.cell_size + self.left + 5,
+                                         y * self.cell_size + self.top + 5, self.cell_size - 10,
+                                         self.cell_size - 10))
+                if self.cur_person == "blue":
+                    pygame.draw.rect(screen, pygame.Color("blue"),
+                                     (x * self.cell_size + self.left, y * self.cell_size + self.top,
+                                      self.cell_size,
+                                      self.cell_size), 1)
+                else:
+                    pygame.draw.rect(screen, pygame.Color("red"),
+                                     (x * self.cell_size + self.left, y * self.cell_size + self.top,
+                                      self.cell_size,
+                                      self.cell_size), 1)
         for y in range(self.height):
             for x in range(self.width - 1):
                 if self.walls1[y][x] == 1:
                     color = pygame.Color("green")
                     pygame.draw.rect(screen, color,
-                                     (x * self.cell_size + self.left + self.cell_size * 7 // 8,
-                                      y * self.cell_size + self.top, self.cell_size / 4,
+                                     (x * self.cell_size + self.left + 65,
+                                      y * self.cell_size + self.top, 10,
                                       self.cell_size))
         for y in range(self.height - 1):
             for x in range(self.width):
@@ -622,20 +628,21 @@ class Quoridor(Board):
                     color = pygame.Color("green")
                     pygame.draw.rect(screen, color,
                                      (x * self.cell_size + self.left,
-                                      y * self.cell_size + self.top + self.cell_size * 7 // 8, self.cell_size,
-                                      self.cell_size / 4))
+                                      y * self.cell_size + self.top + 65, self.cell_size,
+                                      10))
 
 
-def main_1():
+def level(size_board, level_num):
+    global result, cur_level
     pygame.init()
-    size = 650, 650
+    size = size_board * 70 + 20, size_board * 70 + 20
     screen = pygame.display.set_mode(size)
     clock = pygame.time.Clock()
     pygame.display.set_caption('Quoridor')
     last_wall_press = (100, 100)
 
-    board = Quoridor(9, 9)
-    board.set_view(9, 9, 70)
+    board = Quoridor(size_board, size_board)
+    board.set_view(size_board, size_board, 70)
 
     ticks = 0
     ticks2 = 0
@@ -645,7 +652,8 @@ def main_1():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
-            if result[0] != ['', 0]:
+            if result[cur_level] != ['', 0] and cur_level == level_num:
+                cur_level += 1
                 return
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 last_wall_press = event.pos
@@ -678,61 +686,9 @@ def main_1():
         ticks2 += 1
 
 
-def main_2():
-    pygame.init()
-    size = 790, 790
-    screen = pygame.display.set_mode(size)
-    clock = pygame.time.Clock()
-    pygame.display.set_caption('Quoridor')
-    last_wall_press = (100, 100)
-
-    board1 = Quoridor(11, 11)
-    board1.set_view(11, 11, 70)
-
-    ticks = 0
-    ticks2 = 0
-    ticks3 = 0
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                terminate()
-            if result[1] != ['', 0]:
-                return
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                last_wall_press = event.pos
-                board1.get_click_wall(last_wall_press, None)
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3 and board1.curent_wall() == 0:
-                board1.get_click_move(event.pos)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT and board1.curent_wall() == 1:
-                board1.get_click_wall(last_wall_press, "left")
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT and board1.curent_wall() == 1:
-                board1.get_click_wall(last_wall_press, "right")
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP and board1.curent_wall() == 1:
-                board1.get_click_wall(last_wall_press, "up")
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN and board1.curent_wall() == 1:
-                board1.get_click_wall(last_wall_press, "down")
-
-        screen.fill((0, 0, 0))
-        board1.render(screen, ticks3)
-        if ticks == 60:
-            ticks = 0
-        if ticks2 == 20:
-            ticks2 = 0
-            if ticks3 == 1:
-                ticks3 = 0
-            else:
-                ticks3 = 1
-
-        pygame.display.flip()
-        clock.tick(60)
-        ticks += 1
-        ticks2 += 1
-
-
 if __name__ == '__main__':
     start_screen()
-    main_1()
+    level(9, 0)
     result_screen_1()
-    main_2()
+    level(11, 1)
     result_screen_2()
