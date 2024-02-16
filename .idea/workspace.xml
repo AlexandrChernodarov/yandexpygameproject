@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95a41fa2-2bb1-422b-9d18-c58bcea3f914" name="Changes" comment="заставка с шариком, изменён result">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-    </list>
+    <list default="true" id="95a41fa2-2bb1-422b-9d18-c58bcea3f914" name="Changes" comment="презентация" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -118,7 +115,15 @@
       <option name="project" value="LOCAL" />
       <updated>1707849419757</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="презентация">
+      <option name="closed" value="true" />
+      <created>1707852063046</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1707852063046</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -140,6 +145,7 @@
     <MESSAGE value="анимация" />
     <MESSAGE value="requirements" />
     <MESSAGE value="заставка с шариком, изменён result" />
-    <option name="LAST_COMMIT_MESSAGE" value="заставка с шариком, изменён result" />
+    <MESSAGE value="презентация" />
+    <option name="LAST_COMMIT_MESSAGE" value="презентация" />
   </component>
 </project>
