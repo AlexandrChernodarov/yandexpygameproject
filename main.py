@@ -544,7 +544,7 @@ class Quoridor(Board):
                                           x == self.blue_pos[0] and y - 1 == self.blue_pos[1] and
                                           self.walls2[min(y, y - 1)][x] == 0 or
                                           x == self.blue_pos[0] and y + 1 == self.blue_pos[1] and
-                                          self.walls2[min(y, y + 1)][x] == 0):
+                                          self.walls2[min(y, y + 1)][x] == 0 and self.board[y][x] != 3):
             self.board[self.blue_pos[1]][self.blue_pos[0]] = 0
             self.blue_pos = cell
             self.board[y][x] = 2
@@ -558,7 +558,7 @@ class Quoridor(Board):
                                            x == self.red_pos[0] and y - 1 == self.red_pos[1] and
                                            self.walls2[min(y, y - 1)][x] == 0 or
                                            x == self.red_pos[0] and y + 1 == self.red_pos[1] and
-                                           self.walls2[min(y, y + 1)][x] == 0):
+                                           self.walls2[min(y, y + 1)][x] == 0 and self.board[y][x] != 2):
             self.board[self.red_pos[1]][self.red_pos[0]] = 0
             self.red_pos = cell
             self.board[y][x] = 3
